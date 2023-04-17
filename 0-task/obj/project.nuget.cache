@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "M4eU+ZiJmivUAx0qZHTV42Xidbb4lhABgxltb/7iMKfDywmywbtVNNuGp5CWF6wzDVTVe1Hc5IVsbQzErZVwMA==",
+  "success": true,
+  "projectFilePath": "/home/tokin_s/Documents/for-git/csharp-training/0-task/0-task.csproj",
+  "expectedPackageFiles": [
+    "/home/tokin_s/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.8/microsoft.aspnetcore.app.ref.6.0.8.nupkg.sha512"
+  ],
+  "logs": []
+}
