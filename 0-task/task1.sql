@@ -55,6 +55,18 @@ ORDER BY Salary DESC
 
 -- Запрос #2
 
+-- Если я правильно понял данное задание, то это можно сделать следующим образом
+with cte_level AS 
+(
+select Chief_ID, Count(Chief_ID) as N'Количество сотрудников в подчинении (включая самого руководителя)' 
+from Employee
+GROUP by (Chief_ID)
+) SELECT MAX(Chief_ID) from cte_level
+
+-- или просто найти максимум в столбце Chief_ID
+
+SELECT MAX(Chief_ID) from Employee
+
 -- Запрос #3
 
 -- Согласно заданию нужно вывести только отдел, поэтому в данном запросе я и вывожу только его
@@ -65,7 +77,7 @@ GROUP BY d.Name
 ORDER BY SUM(e.Salary) DESC
 
 -- Чтобы убедится в корректности запроса выше, я сделал вот такой запрос:
-SELECT TOP 1 d.Name as Department_Name, SUM(e.Salary) as Total_salary
+SELECT d.Name as Department_Name, SUM(e.Salary) as Total_salary
 FROM Department d
 JOIN Employee e ON e.Department_ID = d.ID
 GROUP BY d.Name
@@ -73,6 +85,6 @@ ORDER BY Total_salary DESC
 
 -- Запрос #4
 
--- Будем считать, что в столбце Name таблицы Employee вводится только одно имя.
+-- Будем считать, что в столбце Name таблицы Employee вводится только одно имя, тогда:
 SELECT * FROM Employee 
 WHERE Name LIKE N'Р%н'
