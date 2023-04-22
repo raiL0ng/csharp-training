@@ -4,39 +4,45 @@ using System.IO;
 namespace MyApp {
     internal class Program {
         static void Main(string[] args) {
-            string? line, s;
+            string? line, s, filename;
             int n, pos, maxlen = 0;
             Dictionary<string, int> dict = new Dictionary<string, int>();
-            try {
-                StreamReader sr = new StreamReader("test.txt");
-                line = sr.ReadLine();
-                while (!String.IsNullOrEmpty(line)) {
-                    n = line.Length;
-                    pos = 0;
-                    for (int i = 0; i < n; i++) {
-                        if (!Char.IsLetter(line[i])) {
-                            if (i - pos <= 0) {
-                                pos++;
-                                continue;
-                            }
-                            s = line.Substring(pos, i - pos).ToLower();
-                            if (maxlen < s.Length) maxlen = s.Length;
-                            if (!dict.ContainsKey(s)) {
-                                dict.Add(s, 0);
-                            }   
-                            dict[s] += 1;
-                            pos = i + 1;
-                        }
-                    }
+            Console.WriteLine("Введите имя файла для считывания:");
+            filename = Console.ReadLine();
+            if (filename != null) {
+                try {
+                    StreamReader sr = new StreamReader(filename);
                     line = sr.ReadLine();
+                    while (!String.IsNullOrEmpty(line)) {
+                        n = line.Length;
+                        pos = 0;
+                        for (int i = 0; i < n; i++) {
+                            if (!Char.IsLetter(line[i])) {
+                                if (i - pos <= 0) {
+                                    pos++;
+                                    continue;
+                                }
+                                s = line.Substring(pos, i - pos).ToLower();
+                                if (maxlen < s.Length) maxlen = s.Length;
+                                if (!dict.ContainsKey(s)) {
+                                    dict.Add(s, 0);
+                                }   
+                                dict[s] += 1;
+                                pos = i + 1;
+                            }
+                        }
+                        line = sr.ReadLine();
+                    }
+                    sr.Close();
                 }
-                sr.Close();
-            }
-            catch(Exception e) {
-                Console.WriteLine("Exception: " + e.Message);
-            }
-            finally {
-                Console.WriteLine("\nВсе слова были успешно посчитаны\n");
+                catch(Exception e) {
+                    Console.WriteLine("Ошибка: " + e.Message);
+                    Environment.Exit(0);
+
+                }
+                finally {
+                    Console.WriteLine("\nВсе слова были успешно посчитаны\n");
+                }
             }
             var sortedDict = dict.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
             try {
@@ -58,7 +64,9 @@ namespace MyApp {
                 sw.Close();
             }
             catch(Exception e) {
-                Console.WriteLine("Exception: " + e.Message);
+                Console.WriteLine("Ошибка: " + e.Message);
+                Environment.Exit(0);
+
             }
             finally {
                 Console.WriteLine("Все слова записаны в файл \"words-freq.txt\" в порядке убывания");
