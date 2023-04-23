@@ -9,7 +9,7 @@ create table Employee
 (
 [ID] int not null identity(1, 1) primary key,
 [Department_ID] int not null,
-[Chief_ID] int not null,
+[Chief_ID] int null,
 [Name] nvarchar(100) not null,
 [Salary] int not null
 );
@@ -31,7 +31,7 @@ INSERT INTO Department (Name) VALUES
 (N'Исследовательский отдел');
 
 INSERT INTO Employee (Department_ID, Chief_ID, Name, Salary) VALUES
-(1, 1, N'Александр', 55000),
+(1, null, N'Александр', 55000),
 (1, 1, N'Евгения', 60000),
 (2, 1, N'Андрей', 65000),
 (2, 2, N'Ольга', 70000),
@@ -40,7 +40,9 @@ INSERT INTO Employee (Department_ID, Chief_ID, Name, Salary) VALUES
 (4, 4, N'Сергей', 80000),
 (5, 4, N'Екатерина', 85000),
 (6, 4, N'Роман', 50000),
-(6, 4, N'Наталья', 55000); 
+(6, 4, N'Наталья', 55000),
+(6, 5, N'Ренат', 40000),
+(6, 5, N'Олег', 55000);
 
 -- Напишите запросы, которые выведут:
 --    1. Сотрудника с максимальной заработной платой.
@@ -55,17 +57,18 @@ ORDER BY Salary DESC
 
 -- Запрос #2
 
--- Если я правильно понял данное задание, то это можно сделать следующим образом
-with cte_level AS 
+-- Если я правильно понял данное задание, то у нас есть какой-то главный руководитель, у которого
+-- значение Chief_ID = null (и он такой один), тогда нахождение глубины дерева можно посчитать следующим образом:
+
+WITH cte_find_lvl AS
 (
-select Chief_ID, Count(Chief_ID) as N'Количество сотрудников в подчинении (включая самого руководителя)' 
-from Employee
-GROUP by (Chief_ID)
-) SELECT MAX(Chief_ID) from cte_level
-
--- или просто найти максимум в столбце Chief_ID
-
-SELECT MAX(Chief_ID) from Employee
+  SELECT e.ID, e.Chief_ID, 1 AS lvl FROM Employee e where e.Chief_ID is null
+  UNION ALL
+  SELECT e.ID, e.Chief_ID, lvl + 1 FROM Employee e
+  JOIN cte_find_lvl c
+  on e.Chief_ID = c.id
+)
+SELECT MAX(lvl) FROM cte_find_lvl
 
 -- Запрос #3
 
