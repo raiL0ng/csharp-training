@@ -1,39 +1,45 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace MyApp {
     internal class Program {
         static void Main(string[] args) {
-            string? line, s, filename;
-            int n, pos, maxlen = 0;
+            string? text, filename;
+            int maxlen = 0;
             Dictionary<string, int> dict = new Dictionary<string, int>();
             Console.WriteLine("Введите имя файла для считывания:");
             filename = Console.ReadLine();
             if (filename != null) {
                 try {
-                    StreamReader sr = new StreamReader(filename);
-                    line = sr.ReadLine();
-                    while (!String.IsNullOrEmpty(line)) {
-                        n = line.Length;
-                        pos = 0;
-                        for (int i = 0; i < n; i++) {
-                            if (!Char.IsLetter(line[i])) {
-                                if (i - pos <= 0) {
-                                    pos++;
-                                    continue;
-                                }
-                                s = line.Substring(pos, i - pos).ToLower();
-                                if (maxlen < s.Length) maxlen = s.Length;
-                                if (!dict.ContainsKey(s)) {
-                                    dict.Add(s, 0);
-                                }   
-                                dict[s] += 1;
-                                pos = i + 1;
-                            }
-                        }
-                        line = sr.ReadLine();
+                    text = File.ReadAllText(filename);
+                    text = text.ToLower();
+                    Regex regular_exp = new Regex("[^а-яa-z\']");
+                    text = regular_exp.Replace(text, " ");
+                    string[] words = text.Split( new char[] {' '}
+                                               , StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var el in words) {
+                        if (maxlen < el.Length) maxlen = el.Length;
+                        if (!dict.ContainsKey(el)) dict.Add(el, 0);
+                        dict[el] += 1;
                     }
-                    sr.Close();
+                    Console.WriteLine("\nВсе слова были успешно посчитаны\n");
+                    var sortedDict = dict.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+                    StreamWriter sw = new StreamWriter("words-freq.txt");
+                    maxlen += 2;
+                    string tabs;
+                    int tabs_cnt, tmp_len;
+                    foreach (var el in sortedDict) {
+                        tabs_cnt = 0;
+                        tabs = "";
+                        tmp_len = maxlen - el.Key.Length;
+                        while (tabs_cnt < tmp_len) {
+                            tabs_cnt++;
+                            tabs += ' ';
+                        }
+                        sw.WriteLine("{0}{1}{2}", el.Key, tabs, el.Value);
+                    }
+                    sw.Close();
                 }
                 catch(Exception e) {
                     Console.WriteLine("Ошибка: " + e.Message);
@@ -41,37 +47,9 @@ namespace MyApp {
 
                 }
                 finally {
-                    Console.WriteLine("\nВсе слова были успешно посчитаны\n");
+                    Console.WriteLine("Все слова записаны в файл \"words-freq.txt\" в порядке убывания");
                 }
             }
-            var sortedDict = dict.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
-            try {
-                
-                StreamWriter sw = new StreamWriter("words-freq.txt");
-                maxlen += 2;
-                string tabs;
-                int tabs_cnt, tmp_len;
-                foreach (var el in sortedDict) {
-                    tabs_cnt = 0;
-                    tabs = "";
-                    tmp_len = maxlen - el.Key.Length;
-                    while (tabs_cnt < tmp_len) {
-                        tabs_cnt++;
-                        tabs += ' ';
-                    }
-                    sw.WriteLine("{0}{1}{2}", el.Key, tabs, el.Value);
-                }
-                sw.Close();
-            }
-            catch(Exception e) {
-                Console.WriteLine("Ошибка: " + e.Message);
-                Environment.Exit(0);
-
-            }
-            finally {
-                Console.WriteLine("Все слова записаны в файл \"words-freq.txt\" в порядке убывания");
-            }
-
         }
     }
 }
